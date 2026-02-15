@@ -32,7 +32,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
-public class IntakeMechanism extends SubsystemBase {
+public class IndexerMechanism extends SubsystemBase {
 
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
@@ -43,22 +43,22 @@ public class IntakeMechanism extends SubsystemBase {
   .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
   .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
   // Telemetry name and verbosity level
-  .withTelemetry("IntakeMotor", TelemetryVerbosity.HIGH)
+  .withTelemetry("IndexerMotor", TelemetryVerbosity.HIGH)
   // Gearing from the motor rotor to final shaft.
   // In this example GearBox.fromReductionStages(3,4) is the same as GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to your motor.
   // You could also use .withGearing(12) which does the same thing.
-  .withGearing(32/18)
+  .withGearing(16/18)
   // Motor properties to prevent over currenting.
   .withMotorInverted(false)
   .withIdleMode(MotorMode.COAST)
   .withStatorCurrentLimit(Amps.of(40));
 
-  private TalonFX talon = new TalonFX(10);
+  private TalonFX talon = new TalonFX(9);
 
   private SmartMotorController talonSmartMotorController = new TalonFXWrapper(talon, DCMotor.getKrakenX60(1), smcConfig) { 
   };
 
-   private final FlyWheelConfig intakeConfig = new FlyWheelConfig(talonSmartMotorController)
+   private final FlyWheelConfig indexerConfig = new FlyWheelConfig(talonSmartMotorController)
   // Diameter of the flywheel.
   .withDiameter(Inches.of(4))
   // Mass of the flywheel.
@@ -66,17 +66,17 @@ public class IntakeMechanism extends SubsystemBase {
   // Maximum speed of the shooter.
   .withUpperSoftLimit(RPM.of(1000))
   // Telemetry name and verbosity for the arm.
-  .withTelemetry("IntakeMech", TelemetryVerbosity.HIGH);
+  .withTelemetry("IndexerMech", TelemetryVerbosity.HIGH);
 
   // Shooter Mechanism
-  private FlyWheel intake = new FlyWheel(intakeConfig);
+  private FlyWheel indexer = new FlyWheel(indexerConfig);
 
    /**
    * Gets the current velocity of the shooter.
    *
    * @return Shooter velocity.
    */
-  public AngularVelocity getVelocity() {return intake.getSpeed();}
+  public AngularVelocity getVelocity() {return indexer.getSpeed();}
 
   /**
    * Set the shooter velocity.
@@ -84,7 +84,7 @@ public class IntakeMechanism extends SubsystemBase {
    * @param speed Speed to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command setVelocity(AngularVelocity speed) {return intake.setSpeed(speed);}
+  public Command setVelocity(AngularVelocity speed) {return indexer.setSpeed(speed);}
 
   /**
    * Set the dutycycle of the shooter.
@@ -92,10 +92,10 @@ public class IntakeMechanism extends SubsystemBase {
    * @param dutyCycle DutyCycle to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command set(double dutyCycle) {return intake.set(dutyCycle);}
+  public Command set(double dutyCycle) {return indexer.set(dutyCycle);}
   
   /** Creates a new ExampleSubsystem. */
-  public IntakeMechanism() {}
+  public IndexerMechanism() {}
 
   /**
    * Example command factory method.

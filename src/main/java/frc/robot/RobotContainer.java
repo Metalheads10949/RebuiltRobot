@@ -16,8 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.IntakeMechanism;
+import frc.robot.subsystems.*;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -33,16 +32,22 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController m_driverController = new CommandXboxController(0);
+    private final CommandXboxController m_operatorController = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     private final IntakeMechanism m_intakeSubsystem = new IntakeMechanism();
+    private final IndexerMechanism m_indexerSubsystem = new IndexerMechanism();
+    private final LauncherMechanism m_launcherSubsystem = new LauncherMechanism();
 
     public RobotContainer() {
         configureBindings();
 
         // Set the default command to force the shooter rest.
         m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.set(0));
+        m_indexerSubsystem.setDefaultCommand(m_indexerSubsystem.set(0));
+        m_launcherSubsystem.setDefaultCommand(m_launcherSubsystem.set(0));
+
     }
 
     private void configureBindings() {
@@ -52,8 +57,24 @@ public class RobotContainer {
         m_driverController.b().whileTrue(m_intakeSubsystem.setVelocity(RPM.of(300)));
         // Schedule `set` when the Xbox controller's B button is pressed,
         // cancelling on release.
+
+        //These 2 buttons worked right but nothing else did
+        //The inputs were registering but the motors were angry idk
         m_driverController.x().whileTrue(m_intakeSubsystem.set(0.3));
         m_driverController.y().whileTrue(m_intakeSubsystem.set(-0.3));
+
+        m_operatorController.leftBumper().whileTrue(m_indexerSubsystem.setVelocity(RPM.of(60)));
+        m_operatorController.rightBumper().whileTrue(m_indexerSubsystem.setVelocity(RPM.of(300)));
+        
+        //m_operatorController.x().whileTrue(m_indexerSubsystem.set(0.3));
+        //m_operatorController.y().whileTrue(m_indexerSubsystem.set(-0.3));
+
+        
+        m_operatorController.a().whileTrue(m_launcherSubsystem.setVelocity(RPM.of(60)));
+        m_operatorController.b().whileTrue(m_launcherSubsystem.setVelocity(RPM.of(300)));
+        
+        m_operatorController.x().whileTrue(m_launcherSubsystem.set(0.3));
+        m_operatorController.y().whileTrue(m_launcherSubsystem.set(-0.3));
 
 
         // Note that X is defined as forward according to WPILib convention,
