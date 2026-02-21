@@ -66,8 +66,8 @@ public class RobotContainer {
         m_operatorController.leftBumper().whileTrue(m_indexerSubsystem.setVelocity(RPM.of(60)));
         m_operatorController.rightBumper().whileTrue(m_indexerSubsystem.setVelocity(RPM.of(300)));
         
-        //m_operatorController.x().whileTrue(m_indexerSubsystem.set(0.3));
-        //m_operatorController.y().whileTrue(m_indexerSubsystem.set(-0.3));
+        m_operatorController.x().whileTrue(m_indexerSubsystem.set(0.3));
+        m_operatorController.y().whileTrue(m_indexerSubsystem.set(-0.3));
 
         
         m_operatorController.a().whileTrue(m_launcherSubsystem.setVelocity(RPM.of(60)));
@@ -76,6 +76,7 @@ public class RobotContainer {
         m_operatorController.x().whileTrue(m_launcherSubsystem.set(0.3));
         m_operatorController.y().whileTrue(m_launcherSubsystem.set(-0.3));
 
+        /* 
 
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -109,6 +110,8 @@ public class RobotContainer {
 
         // Reset the field-centric heading on left bumper press.
         m_driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+
+        */
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
