@@ -20,6 +20,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.SmartMechanism;
@@ -34,11 +35,24 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class IntakeMechanism extends SubsystemBase {
 
+  private double kSlowVelocity = 60;
+  private double kFastVelocity = 300;
+
+  private double kP = 1;
+  private double kI = 0;
+  private double kD = 0;
+
+  //double newKP = SmartDashboard.getNumber("kP", 0.0);
+  //if (newKP != previousKP){
+   // leftMaster.config_kP(0, newKP);   
+    //previousKP = newKP;     
+  //}
+
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
   // Feedback Constants (PID Constants)
-  .withClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
-  .withSimClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
+  .withClosedLoopController(kP, kI, kD)
+  .withSimClosedLoopController(kP, kI, kD)
   // Feedforward Constants
   .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
   .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
@@ -92,6 +106,10 @@ public class IntakeMechanism extends SubsystemBase {
    * @param dutyCycle DutyCycle to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
+
+  public Command setSlowVelocity() {return setVelocity((RPM.of(kSlowVelocity)));}
+  public Command setFastVelocity() {return setVelocity((RPM.of(kFastVelocity)));}
+
   public Command set(double dutyCycle) {return intake.set(dutyCycle);}
   
   /** Creates a new ExampleSubsystem. */

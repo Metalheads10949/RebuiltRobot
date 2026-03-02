@@ -53,8 +53,8 @@ public class RobotContainer {
     private void configureBindings() {
         // Schedule `setVelocity` when the Xbox controller's B button is pressed,
         // cancelling on release.
-        m_driverController.a().whileTrue(m_intakeSubsystem.setVelocity(RPM.of(60)));
-        m_driverController.b().whileTrue(m_intakeSubsystem.setVelocity(RPM.of(300)));
+        m_driverController.a().whileTrue(m_intakeSubsystem.setSlowVelocity());
+        m_driverController.b().whileTrue(m_intakeSubsystem.setFastVelocity());
         // Schedule `set` when the Xbox controller's B button is pressed,
         // cancelling on release.
 
@@ -63,17 +63,17 @@ public class RobotContainer {
         m_driverController.x().whileTrue(m_intakeSubsystem.set(0.3));
         m_driverController.y().whileTrue(m_intakeSubsystem.set(-0.3));
 
+        m_driverController.leftBumper().whileTrue(m_indexerSubsystem.set(0.5));
+        m_driverController.rightBumper().whileTrue(m_indexerSubsystem.set(0.3));
+        
+
         m_operatorController.leftBumper().whileTrue(m_indexerSubsystem.setVelocity(RPM.of(60)));
         m_operatorController.rightBumper().whileTrue(m_indexerSubsystem.setVelocity(RPM.of(300)));
-        
-        m_operatorController.x().whileTrue(m_indexerSubsystem.set(0.3));
-        m_operatorController.y().whileTrue(m_indexerSubsystem.set(-0.3));
 
-        
         m_operatorController.a().whileTrue(m_launcherSubsystem.setVelocity(RPM.of(60)));
         m_operatorController.b().whileTrue(m_launcherSubsystem.setVelocity(RPM.of(300)));
         
-        m_operatorController.x().whileTrue(m_launcherSubsystem.set(0.3));
+        m_operatorController.x().whileTrue(m_launcherSubsystem.set(1));
         m_operatorController.y().whileTrue(m_launcherSubsystem.set(-0.3));
 
         /* 
