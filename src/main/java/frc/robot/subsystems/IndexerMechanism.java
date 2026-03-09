@@ -92,7 +92,7 @@ public class IndexerMechanism extends SubsystemBase {
    * @param dutyCycle DutyCycle to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command set(double dutyCycle) {return indexer.set(dutyCycle);}
+  public Command setDutyCycle(double dutyCycle) {return indexer.set(dutyCycle);}
   
   /** Creates a new ExampleSubsystem. */
   public IndexerMechanism() {}
@@ -124,10 +124,12 @@ public class IndexerMechanism extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    indexer.updateTelemetry();
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+    indexer.simIterate();
   }
 }

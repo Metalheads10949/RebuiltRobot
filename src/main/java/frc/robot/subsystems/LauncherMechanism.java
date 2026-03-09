@@ -98,7 +98,7 @@ public class LauncherMechanism extends SubsystemBase {
    * @param dutyCycle DutyCycle to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command set(double dutyCycle) {return launcher.set(dutyCycle);}
+  public Command setDutyCycle(double dutyCycle) {return launcher.set(dutyCycle);}
   
   /** Creates a new ExampleSubsystem. */
   public LauncherMechanism() {}
@@ -130,10 +130,12 @@ public class LauncherMechanism extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    launcher.updateTelemetry();
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+    launcher.simIterate();
   }
 }

@@ -58,6 +58,7 @@ public class IntakeMechanism extends SubsystemBase {
   .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
   // Telemetry name and verbosity level
   .withTelemetry("IntakeMotor", TelemetryVerbosity.HIGH)
+  //.withWheelDiameter(2)
   // Gearing from the motor rotor to final shaft.
   // In this example GearBox.fromReductionStages(3,4) is the same as GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to your motor.
   // You could also use .withGearing(12) which does the same thing.
@@ -74,7 +75,7 @@ public class IntakeMechanism extends SubsystemBase {
 
    private final FlyWheelConfig intakeConfig = new FlyWheelConfig(talonSmartMotorController)
   // Diameter of the flywheel.
-  .withDiameter(Inches.of(4))
+  .withDiameter(Inches.of(2))
   // Mass of the flywheel.
   .withMass(Pounds.of(1))
   // Maximum speed of the shooter.
@@ -110,7 +111,7 @@ public class IntakeMechanism extends SubsystemBase {
   public Command setSlowVelocity() {return setVelocity((RPM.of(kSlowVelocity)));}
   public Command setFastVelocity() {return setVelocity((RPM.of(kFastVelocity)));}
 
-  public Command set(double dutyCycle) {return intake.set(dutyCycle);}
+  public Command setDutyCycle(double dutyCycle) {return intake.set(dutyCycle);}
   
   /** Creates a new ExampleSubsystem. */
   public IntakeMechanism() {}
@@ -142,10 +143,12 @@ public class IntakeMechanism extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    intake.updateTelemetry();
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+    intake.simIterate();
   }
 }

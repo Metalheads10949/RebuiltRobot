@@ -6,10 +6,14 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.DoubleToIntFunction;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -21,6 +25,12 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
+    private int FieldCentricAngle = 0 /*TODO: fix new SwerveRequest.FieldCentricFacingAngle.ForwardPerspectiveValue()*/ ;
+
+    //arctan((robot.x - hub.x)/(robot.y - hub.y))
+    private int HubCentricAngle = 0;
+    private int RotationTarget = FieldCentricAngle;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -41,30 +51,26 @@ public class RobotContainer {
     private final LauncherMechanism m_launcherSubsystem = new LauncherMechanism();
 
     public RobotContainer() {
+        DriverStation.silenceJoystickConnectionWarning(true);
         configureBindings();
 
-        // Set the default command to force the shooter rest.
-        m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.set(0));
-        m_indexerSubsystem.setDefaultCommand(m_indexerSubsystem.set(0));
-        m_launcherSubsystem.setDefaultCommand(m_launcherSubsystem.set(0));
+        m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.setDutyCycle(0));
+        m_indexerSubsystem.setDefaultCommand(m_indexerSubsystem.setDutyCycle(0));
+        m_launcherSubsystem.setDefaultCommand(m_launcherSubsystem.setDutyCycle(0));
 
     }
 
     private void configureBindings() {
-        // Schedule `setVelocity` when the Xbox controller's B button is pressed,
-        // cancelling on release.
-        m_driverController.a().whileTrue(m_intakeSubsystem.setSlowVelocity());
-        m_driverController.b().whileTrue(m_intakeSubsystem.setFastVelocity());
-        // Schedule `set` when the Xbox controller's B button is pressed,
-        // cancelling on release.
+        
+        //m_driverController.a().whileTrue(m_intakeSubsystem.setSlowVelocity());
+        //m_driverController.b().whileTrue(m_intakeSubsystem.setFastVelocity());
+        
 
-        //These 2 buttons worked right but nothing else did
-        //The inputs were registering but the motors were angry idk
-        m_driverController.x().whileTrue(m_intakeSubsystem.set(0.3));
-        m_driverController.y().whileTrue(m_intakeSubsystem.set(-0.3));
+        m_driverController.x().whileTrue(m_intakeSubsystem.setDutyCycle(0.3));
+        m_driverController.y().whileTrue(m_intakeSubsystem.setDutyCycle(-0.3));
 
-        m_driverController.leftBumper().whileTrue(m_indexerSubsystem.set(0.5));
-        m_driverController.rightBumper().whileTrue(m_indexerSubsystem.set(0.3));
+        m_driverController.leftBumper().whileTrue(m_indexerSubsystem.setDutyCycle(0.5));
+        m_driverController.rightBumper().whileTrue(m_indexerSubsystem.setDutyCycle(0.8));
         
 
         m_operatorController.leftBumper().whileTrue(m_indexerSubsystem.setVelocity(RPM.of(60)));
@@ -73,21 +79,19 @@ public class RobotContainer {
         m_operatorController.a().whileTrue(m_launcherSubsystem.setVelocity(RPM.of(60)));
         m_operatorController.b().whileTrue(m_launcherSubsystem.setVelocity(RPM.of(300)));
         
-        m_operatorController.x().whileTrue(m_launcherSubsystem.set(1));
-        m_operatorController.y().whileTrue(m_launcherSubsystem.set(-0.3));
+        m_operatorController.x().whileTrue(m_launcherSubsystem.setDutyCycle(1));
+        m_operatorController.y().whileTrue(m_launcherSubsystem.setDutyCycle(0.7));
 
-        /* 
-
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
+        //field centric drive command
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(m_driverController.getLeftY() * MaxSpeed) // Drive forward with positive Y (forward)
                     .withVelocityY(m_driverController.getLeftX() * MaxSpeed) // Drive left with positive X (left)
                     .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                    //.withForwardPerspective(SwerveRequest.ForwardPerspectiveValue(RotationTarget))
             )
         );
+        
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -109,9 +113,7 @@ public class RobotContainer {
         m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // Reset the field-centric heading on left bumper press.
-        m_driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
-        */
+        //m_driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
