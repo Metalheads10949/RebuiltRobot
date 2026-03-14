@@ -99,6 +99,8 @@ public class LauncherMechanism extends SubsystemBase {
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command setDutyCycle(double dutyCycle) {return launcher.set(dutyCycle);}
+
+  public Command setVoltage(double volts) {return launcher.setVoltage(Volts.of(volts));}
   
   /** Creates a new ExampleSubsystem. */
   public LauncherMechanism() {}

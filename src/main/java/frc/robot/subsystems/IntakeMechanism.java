@@ -112,6 +112,8 @@ public class IntakeMechanism extends SubsystemBase {
   public Command setFastVelocity() {return setVelocity((RPM.of(kFastVelocity)));}
 
   public Command setDutyCycle(double dutyCycle) {return intake.set(dutyCycle);}
+
+  public Command setVoltage(double volts) {return intake.setVoltage(Volts.of(volts));}
   
   /** Creates a new ExampleSubsystem. */
   public IntakeMechanism() {}

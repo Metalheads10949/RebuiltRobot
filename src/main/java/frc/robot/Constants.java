@@ -1,6 +1,9 @@
 package frc.robot;
 
 public class Constants {
+
+    public double krakenX60kV = (12/6000) ;
+
     public static final class IndexerConstants {
 
     }
