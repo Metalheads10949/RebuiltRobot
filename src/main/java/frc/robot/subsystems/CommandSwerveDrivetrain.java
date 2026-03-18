@@ -220,6 +220,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    /**
+     * Updates the drivetrain's pose estimator with data from QuestNav.
+     * @param visionRobotPose The 2D pose calculated by QuestNav.
+     * @param timestamp The timestamp from the QuestNav app (in seconds).
+     */
+    public void updateVisionFromQuest(Pose2d visionRobotPose, double timestamp) {
+        // This calls your override below which handles the FPGA time conversion
+        this.addVisionMeasurement(visionRobotPose, timestamp);
+    }
+
     @Override
     public void periodic() {
         /*

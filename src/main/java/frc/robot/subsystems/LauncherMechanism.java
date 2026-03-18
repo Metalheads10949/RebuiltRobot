@@ -101,6 +101,12 @@ public class LauncherMechanism extends SubsystemBase {
   public Command setDutyCycle(double dutyCycle) {return launcher.set(dutyCycle);}
 
   public Command setVoltage(double volts) {return launcher.setVoltage(Volts.of(volts));}
+
+  public Command smartLaunch(double distance) {
+    return setVoltage(
+      1 * distance * distance +
+      2 * distance +
+      3);}
   
   /** Creates a new ExampleSubsystem. */
   public LauncherMechanism() {}
