@@ -57,6 +57,8 @@ public class RobotContainer {
     private final IndexerMechanism m_indexerSubsystem = new IndexerMechanism();
     private final LauncherMechanism m_launcherSubsystem = new LauncherMechanism(); 
 
+    public double currentLauncherVoltage = 0;
+
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
         robotPose = drivetrain.getState().Pose.getTranslation();
@@ -105,13 +107,19 @@ public class RobotContainer {
             })
         );
 
-        m_driverController.povLeft().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.NORMAL));
-        m_driverController.povUp().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.BUMP));
-        m_driverController.povRight().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.HUB_LOCK));
+        //m_driverController.povLeft().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.NORMAL));
+        //m_driverController.povUp().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.BUMP));
+        //m_driverController.povRight().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.HUB_LOCK));
 
         m_driverController.leftBumper().whileTrue(m_indexerSubsystem.setVoltage(0.7 * 12));
-        m_driverController.rightBumper().whileTrue(m_launcherSubsystem.smartLaunch(robotPose.getDistance(HUB_LOCATION)));
+        m_driverController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(currentLauncherVoltage));
+        //m_driverController.rightBumper().whileTrue(m_launcherSubsystem.smartLaunch(robotPose.getDistance(HUB_LOCATION)));
         m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+
+        m_driverController.povLeft().onTrue(Commands.runOnce(() -> currentLauncherVoltage -= 0.5));
+        m_driverController.povRight().onTrue(Commands.runOnce(() -> currentLauncherVoltage += 0.5));
+        m_driverController.povDown().onTrue(Commands.runOnce(() -> currentLauncherVoltage -= 0.01));
+        m_driverController.povUp().onTrue(Commands.runOnce(() -> currentLauncherVoltage += 0.01));
         
         //m_driverController.y().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     }
