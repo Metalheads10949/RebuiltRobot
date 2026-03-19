@@ -57,7 +57,14 @@ public class RobotContainer {
     private final IndexerMechanism m_indexerSubsystem = new IndexerMechanism();
     private final LauncherMechanism m_launcherSubsystem = new LauncherMechanism(); 
 
-    public double currentLauncherVoltage = 0;
+    public double currentLauncherVoltage = 1;
+
+    private void logVoltageChange() {
+    String message = "Current Launcher Voltage: " + currentLauncherVoltage;
+    m_launcherSubsystem.UpdateCurrentVoltage(currentLauncherVoltage);
+    
+    System.out.println(message);
+    }
 
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
@@ -111,15 +118,43 @@ public class RobotContainer {
         //m_driverController.povUp().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.BUMP));
         //m_driverController.povRight().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.HUB_LOCK));
 
-        m_driverController.leftBumper().whileTrue(m_indexerSubsystem.setVoltage(0.7 * 12));
-        m_driverController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(currentLauncherVoltage));
+        m_driverController.leftBumper().whileTrue(m_indexerSubsystem.setVoltage(8));
+        m_driverController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(3));
+        
         //m_driverController.rightBumper().whileTrue(m_launcherSubsystem.smartLaunch(robotPose.getDistance(HUB_LOCATION)));
-        m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        //m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
 
-        m_driverController.povLeft().onTrue(Commands.runOnce(() -> currentLauncherVoltage -= 0.5));
-        m_driverController.povRight().onTrue(Commands.runOnce(() -> currentLauncherVoltage += 0.5));
-        m_driverController.povDown().onTrue(Commands.runOnce(() -> currentLauncherVoltage -= 0.01));
-        m_driverController.povUp().onTrue(Commands.runOnce(() -> currentLauncherVoltage += 0.01));
+        /*
+        m_driverController.x().onTrue(Commands.runOnce(() -> currentLauncherVoltage -= 0.5));
+        m_driverController.b().onTrue(Commands.runOnce(() -> currentLauncherVoltage += 0.5));
+        m_driverController.a().onTrue(Commands.runOnce(() -> currentLauncherVoltage -= 0.01));
+        m_driverController.y().onTrue(Commands.runOnce(() -> currentLauncherVoltage += 0.01));
+        */
+
+        m_driverController.y().onTrue(
+        Commands.runOnce(() -> {
+            currentLauncherVoltage += 0.01;
+            logVoltageChange();
+            })
+        );
+        m_driverController.a().onTrue(
+            Commands.runOnce(() -> {
+                currentLauncherVoltage -= 0.01;
+                logVoltageChange();
+            })
+        );
+        m_driverController.b().onTrue(
+            Commands.runOnce(() -> {
+                currentLauncherVoltage += 0.5;
+                logVoltageChange();
+            })
+        );
+        m_driverController.x().onTrue(
+            Commands.runOnce(() -> {
+                currentLauncherVoltage -= 0.5;
+                logVoltageChange();
+            })
+        );
         
         //m_driverController.y().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     }

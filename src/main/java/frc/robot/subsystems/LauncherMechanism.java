@@ -10,6 +10,9 @@ import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
+
+import java.util.function.DoubleSupplier;
+
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
@@ -22,6 +25,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.SmartMechanism;
 import yams.mechanisms.config.FlyWheelConfig;
@@ -32,8 +36,11 @@ import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
+import frc.robot.RobotContainer;
 
 public class LauncherMechanism extends SubsystemBase {
+
+  public double currentVoltage = 1;
   
   private TalonFX talonLeft = new TalonFX(11);
   //private TalonFX talonRight = new TalonFX(12);
@@ -100,13 +107,17 @@ public class LauncherMechanism extends SubsystemBase {
    */
   public Command setDutyCycle(double dutyCycle) {return launcher.set(dutyCycle);}
 
-  public Command setVoltage(double volts) {return launcher.setVoltage(Volts.of(volts));}
+  public Command UpdateCurrentVoltage(double input) {return new InstantCommand(() -> {currentVoltage = input;});}
 
+  public Command setVoltage(double volts) {return new InstantCommand(() -> launcher.setVoltage(Volts.of(volts)));}
+
+      /* 
   public Command smartLaunch(double distance) {
     return setVoltage(
       1 * distance * distance +
       2 * distance +
       3);}
+      */
   
   /** Creates a new ExampleSubsystem. */
   public LauncherMechanism() {}
