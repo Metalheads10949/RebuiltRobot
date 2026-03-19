@@ -89,7 +89,7 @@ public class TunerConstants {
     public static final Pigeon2Configuration pigeonConfigs = new Pigeon2Configuration();
     static {
     pigeonConfigs.MountPose.MountPoseRoll = 0; 
-    pigeonConfigs.MountPose.MountPoseYaw = 0;
+    pigeonConfigs.MountPose.MountPoseYaw = 180;
     pigeonConfigs.MountPose.MountPosePitch = 180;
 }
 

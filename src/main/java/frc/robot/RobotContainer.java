@@ -119,7 +119,7 @@ public class RobotContainer {
         //m_driverController.povRight().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.HUB_LOCK));
 
         m_driverController.leftBumper().whileTrue(m_indexerSubsystem.setVoltage(8));
-        m_driverController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(3));
+        m_driverController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(8));
         
         //m_driverController.rightBumper().whileTrue(m_launcherSubsystem.smartLaunch(robotPose.getDistance(HUB_LOCATION)));
         //m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));

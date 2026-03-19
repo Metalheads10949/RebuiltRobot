@@ -109,14 +109,13 @@ public class LauncherMechanism extends SubsystemBase {
 
   public Command UpdateCurrentVoltage(double input) {return new InstantCommand(() -> {currentVoltage = input;});}
 
-  public Command setVoltage(double volts) {return new InstantCommand(() -> launcher.setVoltage(Volts.of(volts)));}
+  public Command setVoltage(double volts) {return launcher.setVoltage(Volts.of(volts));}
 
       /* 
   public Command smartLaunch(double distance) {
     return setVoltage(
-      1 * distance * distance +
-      2 * distance +
-      3);}
+      0.0193281 * distance +
+      5.42553);}
       */
   
   /** Creates a new ExampleSubsystem. */
