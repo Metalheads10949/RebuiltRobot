@@ -34,7 +34,7 @@ public class RobotContainer {
 
     private DriveMode m_currentMode = DriveMode.NORMAL;
 
-    private final Translation2d HUB_LOCATION = new Translation2d(8.25, 4.05);
+    private final Translation2d HUB_LOCATION = new Translation2d(2, 0);
 
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
@@ -49,6 +49,7 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
     private final CommandXboxController m_driverController = new CommandXboxController(0);
+    private final CommandXboxController m_operatorController = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public Translation2d robotPose;
@@ -107,8 +108,11 @@ public class RobotContainer {
                     case NORMAL:
                     default:
                         return drive
-                            .withVelocityX(-m_driverController.getLeftY() * MaxSpeed)
-                            .withVelocityY(-m_driverController.getLeftX() * MaxSpeed)
+                            //for blue alliance X and Y should be negative
+                            //for red alliance X and Y should be positive
+                            //rotation is always negative
+                            .withVelocityX(m_driverController.getLeftY() * MaxSpeed)
+                            .withVelocityY(m_driverController.getLeftX() * MaxSpeed)
                             .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate);
                 }
             })
@@ -118,8 +122,10 @@ public class RobotContainer {
         //m_driverController.povUp().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.BUMP));
         //m_driverController.povRight().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.HUB_LOCK));
 
-        m_driverController.leftBumper().whileTrue(m_indexerSubsystem.setVoltage(8));
-        m_driverController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(8));
+        m_operatorController.leftBumper().whileTrue(m_indexerSubsystem.setVoltage(8));
+        m_operatorController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(7.5));
+        m_operatorController.povUp().whileTrue(m_intakeSubsystem.setVoltage(-10));
+        m_operatorController.povDown().whileTrue(m_intakeSubsystem.setVoltage(6));
         
         //m_driverController.rightBumper().whileTrue(m_launcherSubsystem.smartLaunch(robotPose.getDistance(HUB_LOCATION)));
         //m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
@@ -130,7 +136,7 @@ public class RobotContainer {
         m_driverController.a().onTrue(Commands.runOnce(() -> currentLauncherVoltage -= 0.01));
         m_driverController.y().onTrue(Commands.runOnce(() -> currentLauncherVoltage += 0.01));
         */
-
+            /* 
         m_driverController.y().onTrue(
         Commands.runOnce(() -> {
             currentLauncherVoltage += 0.01;
@@ -154,7 +160,7 @@ public class RobotContainer {
                 currentLauncherVoltage -= 0.5;
                 logVoltageChange();
             })
-        );
+        ); */
         
         //m_driverController.y().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     }

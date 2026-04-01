@@ -18,7 +18,7 @@ public class QuestNavSubsystem extends SubsystemBase {
    * Example: Camera is 0.5 meters up, 0.1 meters forward, and tilted up 20 degrees.
    */
   private static final Transform3d ROBOT_TO_QUEST = new Transform3d(
-      0.1, 0.0, 0.5, new Rotation3d(0.0, Math.toRadians(-20), 0.0));
+      0.299720, 0.291492, 0.331962, new Rotation3d(0.0, Math.toRadians(-20), 0.0));
 
   public QuestNavSubsystem() {
     questNav = new QuestNav();

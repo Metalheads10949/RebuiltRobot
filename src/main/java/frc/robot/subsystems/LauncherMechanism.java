@@ -111,12 +111,11 @@ public class LauncherMechanism extends SubsystemBase {
 
   public Command setVoltage(double volts) {return launcher.setVoltage(Volts.of(volts));}
 
-      /* 
   public Command smartLaunch(double distance) {
     return setVoltage(
-      0.0193281 * distance +
+      0.0193281 * (distance - 0.311150) +
       5.42553);}
-      */
+  
   
   /** Creates a new ExampleSubsystem. */
   public LauncherMechanism() {}
