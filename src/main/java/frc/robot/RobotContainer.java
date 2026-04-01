@@ -10,14 +10,15 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.AgitatorMechanism;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IndexerMechanism;
 import frc.robot.subsystems.IntakeMechanism;
 import frc.robot.subsystems.LauncherMechanism;
-import frc.robot.subsystems.AgitatorMechanism;
 import frc.robot.subsystems.QuestNavSubsystem;
 
 public class RobotContainer {
@@ -91,82 +92,37 @@ public class RobotContainer {
         m_launcherSubsystem.setDefaultCommand(m_launcherSubsystem.setDutyCycle(0));
     }
 
+    public Command getAutonomousCommand() {
+        return Commands.runOnce(() -> {
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+            // Red alliance faces 180 degrees away from the blue origin
+            drivetrain.seedFieldCentric(Rotation2d.fromDegrees(180));
+        } else {
+            // Blue alliance faces 0 degrees
+            drivetrain.seedFieldCentric(Rotation2d.fromDegrees(0));
+        }
+    }, drivetrain);
+    }
+
     private void configureBindings() {
         drivetrain.setDefaultCommand(
-            drivetrain.applyRequest(() -> {
-                switch (m_currentMode) {
-                    case BUMP:
-                        return driveFacingAngle
-                            .withVelocityX(-m_driverController.getLeftY() * MaxSpeed)
-                            .withVelocityY(-m_driverController.getLeftX() * MaxSpeed)
-                            .withTargetDirection(Rotation2d.fromDegrees(180));
-
-                    case HUB_LOCK:
-                        Rotation2d angleToHub = HUB_LOCATION.minus(robotPose).getAngle();
-                        return driveFacingAngle
-                            .withVelocityX(-m_driverController.getLeftY() * MaxSpeed)
-                            .withVelocityY(-m_driverController.getLeftX() * MaxSpeed)
-                            .withTargetDirection(angleToHub);
-
-                    case NORMAL:
-                    default:
-                        return drive
-                            //for blue alliance X and Y should be negative
-                            //for red alliance X and Y should be positive
-                            //rotation is always negative
-                            .withVelocityX(m_driverController.getLeftY() * MaxSpeed)
-                            .withVelocityY(m_driverController.getLeftX() * MaxSpeed)
-                            .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate);
-                }
-            })
+        drivetrain.applyRequest(() -> 
+            drive.withVelocityX(-m_driverController.getLeftY() * MaxSpeed)
+                 .withVelocityY(-m_driverController.getLeftX() * MaxSpeed)
+                 .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate)
+            )
         );
 
-        //m_driverController.povLeft().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.NORMAL));
-        //m_driverController.povUp().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.BUMP));
-        //m_driverController.povRight().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.HUB_LOCK));
-
+        //Launch
+        m_operatorController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(7.5));
+        //Index
         m_operatorController.leftBumper().whileTrue(m_indexerSubsystem.setVoltage(8));
         m_operatorController.leftBumper().whileTrue(m_agitatorSubsystem.setVoltage(12));
-        m_operatorController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(7.5));
-        m_operatorController.povUp().whileTrue(m_intakeSubsystem.setVoltage(-10));
+        //Intake
         m_operatorController.povDown().whileTrue(m_intakeSubsystem.setVoltage(6));
         m_operatorController.a().whileTrue(m_agitatorSubsystem.setVoltage(-12));
-        
-        //m_driverController.rightBumper().whileTrue(m_launcherSubsystem.smartLaunch(robotPose.getDistance(HUB_LOCATION)));
-        //m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-
-        /*
-        m_driverController.x().onTrue(Commands.runOnce(() -> currentLauncherVoltage -= 0.5));
-        m_driverController.b().onTrue(Commands.runOnce(() -> currentLauncherVoltage += 0.5));
-        m_driverController.a().onTrue(Commands.runOnce(() -> currentLauncherVoltage -= 0.01));
-        m_driverController.y().onTrue(Commands.runOnce(() -> currentLauncherVoltage += 0.01));
-        */
-            /* 
-        m_driverController.y().onTrue(
-        Commands.runOnce(() -> {
-            currentLauncherVoltage += 0.01;
-            logVoltageChange();
-            })
-        );
-        m_driverController.a().onTrue(
-            Commands.runOnce(() -> {
-                currentLauncherVoltage -= 0.01;
-                logVoltageChange();
-            })
-        );
-        m_driverController.b().onTrue(
-            Commands.runOnce(() -> {
-                currentLauncherVoltage += 0.5;
-                logVoltageChange();
-            })
-        );
-        m_driverController.x().onTrue(
-            Commands.runOnce(() -> {
-                currentLauncherVoltage -= 0.5;
-                logVoltageChange();
-            })
-        ); */
-        
-        //m_driverController.y().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        //Outtake
+        m_operatorController.povUp().whileTrue(m_intakeSubsystem.setVoltage(-10));
     }
 }
