@@ -17,11 +17,13 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IndexerMechanism;
 import frc.robot.subsystems.IntakeMechanism;
 import frc.robot.subsystems.LauncherMechanism;
+import frc.robot.subsystems.AgitatorMechanism;
 import frc.robot.subsystems.QuestNavSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
+    //this was 0.75 but imma try increasing to 1
+    private double MaxAngularRate = RotationsPerSecond.of(1).in(RadiansPerSecond);
 
     /* QuestNav Subsystem */
     private final QuestNavSubsystem m_questNav = new QuestNavSubsystem();
@@ -57,6 +59,7 @@ public class RobotContainer {
     private final IntakeMechanism m_intakeSubsystem = new IntakeMechanism();
     private final IndexerMechanism m_indexerSubsystem = new IndexerMechanism();
     private final LauncherMechanism m_launcherSubsystem = new LauncherMechanism(); 
+    private final AgitatorMechanism m_agitatorSubsystem = new AgitatorMechanism();
 
     public double currentLauncherVoltage = 1;
 
@@ -123,9 +126,11 @@ public class RobotContainer {
         //m_driverController.povRight().onTrue(Commands.runOnce(() -> m_currentMode = DriveMode.HUB_LOCK));
 
         m_operatorController.leftBumper().whileTrue(m_indexerSubsystem.setVoltage(8));
+        m_operatorController.leftBumper().whileTrue(m_agitatorSubsystem.setVoltage(12));
         m_operatorController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(7.5));
         m_operatorController.povUp().whileTrue(m_intakeSubsystem.setVoltage(-10));
         m_operatorController.povDown().whileTrue(m_intakeSubsystem.setVoltage(6));
+        m_operatorController.a().whileTrue(m_agitatorSubsystem.setVoltage(-12));
         
         //m_driverController.rightBumper().whileTrue(m_launcherSubsystem.smartLaunch(robotPose.getDistance(HUB_LOCATION)));
         //m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
