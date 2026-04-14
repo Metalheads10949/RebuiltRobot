@@ -59,7 +59,7 @@ public class AgitatorMechanism extends SubsystemBase {
   .withIdleMode(MotorMode.COAST)
   .withStatorCurrentLimit(Amps.of(8.5));
 
-  private SparkMax sparkMax = new SparkMax(1, MotorType.kBrushed);
+  private SparkMax sparkMax = new SparkMax(20, MotorType.kBrushed);
 
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(sparkMax, DCMotor.getCIM(1), smcConfig) { 
   };

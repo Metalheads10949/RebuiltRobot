@@ -90,19 +90,11 @@ public class RobotContainer {
         m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.setDutyCycle(0));
         m_indexerSubsystem.setDefaultCommand(m_indexerSubsystem.setDutyCycle(0));
         m_launcherSubsystem.setDefaultCommand(m_launcherSubsystem.setDutyCycle(0));
+        m_agitatorSubsystem.setDefaultCommand(m_agitatorSubsystem.setDutyCycle(0));
     }
 
     public Command getAutonomousCommand() {
-        return Commands.runOnce(() -> {
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-            // Red alliance faces 180 degrees away from the blue origin
-            drivetrain.seedFieldCentric(Rotation2d.fromDegrees(180));
-        } else {
-            // Blue alliance faces 0 degrees
-            drivetrain.seedFieldCentric(Rotation2d.fromDegrees(0));
-        }
-    }, drivetrain);
+        return Commands.runOnce(drivetrain::seedFieldCentric);
     }
 
     private void configureBindings() {
@@ -121,7 +113,7 @@ public class RobotContainer {
         m_operatorController.leftBumper().whileTrue(m_agitatorSubsystem.setVoltage(12));
         //Intake
         m_operatorController.povDown().whileTrue(m_intakeSubsystem.setVoltage(6));
-        m_operatorController.a().whileTrue(m_agitatorSubsystem.setVoltage(-12));
+        //m_operatorController.a().whileTrue(m_agitatorSubsystem.setVoltage(-12));
         //Outtake
         m_operatorController.povUp().whileTrue(m_intakeSubsystem.setVoltage(-10));
     }
