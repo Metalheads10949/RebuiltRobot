@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -10,10 +11,15 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -23,7 +29,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -65,6 +70,54 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             this
         )
     );
+
+    /** Returns the current pose of the robot from the CTRE odometry */
+    public Pose2d getPose() {
+        return this.getState().Pose;
+    }
+
+    /** Resets the odometry to a specific pose (X, Y, and Rotation) */
+    public void resetPose(Pose2d pose) {
+        this.getState().Pose = pose;
+    }
+
+    /** Returns the current robot-relative speeds */
+    public ChassisSpeeds getCurrentSpeeds() {
+        return getKinematics().toChassisSpeeds(this.getState().ModuleStates);
+    }
+
+    /** Drives the robot using robot-relative speeds */
+    public void driveRobotRelative(ChassisSpeeds speeds) {
+        this.setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds));
+    }
+
+    public void configurePathPlanner() {
+    try {
+        // 1. Load the robot configuration from the GUI settings
+        RobotConfig config = RobotConfig.fromGUISettings();
+
+        // 2. Configure the AutoBuilder
+        AutoBuilder.configure(
+            this::getPose,              // Robot pose supplier
+            this::resetPose,             // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getCurrentSpeeds,      // Method that returns robot-relative ChassisSpeeds
+            this::driveRobotRelative,    // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            new PPHolonomicDriveController(
+                new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(2.0, 0.0, 0.0)  // Rotation PID constants
+            ),
+            config,
+            () -> {
+                // Boolean supplier that controls when the path will be mirrored for the red alliance
+                var alliance = DriverStation.getAlliance();
+                return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+            },
+            this // Reference to this subsystem to set requirements
+        );
+    } catch (Exception e) {
+        DriverStation.reportError("Failed to load PathPlanner config", e.getStackTrace());
+    }
+}
 
     /* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
     private final SysIdRoutine m_sysIdRoutineSteer = new SysIdRoutine(
@@ -154,6 +207,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+
+        configurePathPlanner();
     }
 
     /**

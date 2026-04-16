@@ -6,10 +6,13 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -57,10 +60,12 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public Translation2d robotPose;
 
-    private final IntakeMechanism m_intakeSubsystem = new IntakeMechanism();
+    //private final IntakeMechanism m_intakeSubsystem = new IntakeMechanism();
     private final IndexerMechanism m_indexerSubsystem = new IndexerMechanism();
     private final LauncherMechanism m_launcherSubsystem = new LauncherMechanism(); 
     private final AgitatorMechanism m_agitatorSubsystem = new AgitatorMechanism();
+
+    //private final SendableChooser<Command> autoChooser;
 
     public double currentLauncherVoltage = 1;
 
@@ -76,6 +81,9 @@ public class RobotContainer {
         robotPose = drivetrain.getState().Pose.getTranslation();
         configureBindings();
 
+        //autoChooser = AutoBuilder.buildAutoChooser(); 
+        //SmartDashboard.putData("Auto Chooser", autoChooser);
+
         drivetrain.registerTelemetry(telem -> {
             logger.telemeterize(telem);
             
@@ -87,7 +95,7 @@ public class RobotContainer {
             }
         });
 
-        m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.setDutyCycle(0));
+        //m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.setDutyCycle(0));
         m_indexerSubsystem.setDefaultCommand(m_indexerSubsystem.setDutyCycle(0));
         m_launcherSubsystem.setDefaultCommand(m_launcherSubsystem.setDutyCycle(0));
         m_agitatorSubsystem.setDefaultCommand(m_agitatorSubsystem.setDutyCycle(0));
@@ -105,7 +113,7 @@ public class RobotContainer {
                  .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate)
             )
         );
-
+            /*
         //Launch
         m_operatorController.rightBumper().whileTrue(m_launcherSubsystem.setVoltage(7.5));
         //Index
@@ -116,5 +124,6 @@ public class RobotContainer {
         //m_operatorController.a().whileTrue(m_agitatorSubsystem.setVoltage(-12));
         //Outtake
         m_operatorController.povUp().whileTrue(m_intakeSubsystem.setVoltage(-10));
+            */
     }
 }
